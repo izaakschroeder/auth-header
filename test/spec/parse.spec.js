@@ -10,6 +10,24 @@ describe('parse', function() {
 		}).to.throw(TypeError);
 	});
 
+	it('should fail if a boolean', function() {
+		expect(function() {
+			parse(true);
+		}).to.throw(TypeError);
+	});
+
+	it('should fail if an object', function() {
+		expect(function() {
+			parse({ });
+		}).to.throw(TypeError);
+	});
+
+	it('should fail if null', function() {
+		expect(function() {
+			parse(null);
+		}).to.throw(TypeError);
+	});
+
 	it('should coalesce many values', function() {
 		var result = parse('foo a=1 a=2 a=3');
 		expect(result).to.deep.equal({
