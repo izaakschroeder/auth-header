@@ -1,6 +1,6 @@
 {
 	"name": "auth-header",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"description": "For HTTP `Authorization` and `WWW-Authenticate` headers.",
 	"author": "Izaak Schroeder <izaak.schroeder@gmail.com>",
 	"keywords": [ "http", "express", "basic", "auth", "authorization" ],
