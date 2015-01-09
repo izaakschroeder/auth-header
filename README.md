@@ -32,9 +32,8 @@ app.get('/', function(req, res) {
 
 	// Something messed up.
 	function fail() {
-		res.status(401);
 		res.set('WWW-Authenticate', authorization.format('Basic'));
-		res.send();
+		res.status(401).send();
 	}
 
 	// Get authorization header.
@@ -54,8 +53,7 @@ app.get('/', function(req, res) {
 	}
 
 	// We've reached the promise land.
-	res.status(200);
-	res.send("Hello world.");
+	res.send('Hello world.');
 });
 ```
 
