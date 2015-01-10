@@ -16,6 +16,8 @@ Deal with obscene HTTP `Authorization` and `WWW-Authenticate` headers.
 | Bearer/OAuth  |    ✓    |    ✓    |
 | [RFC7235]     |    ✓    |    ✓    |
 
+***Note***: If you're looking for an all-on-one solution to do authentication against these headers check out [express-authentication-header] which uses this library behind the scenes.
+
 The HTTP `Authorization` and `WWW-Authenticate` family of headers are both pretty nightmareish; there has been, up until recently, no wide consensus about how they should be formatted and so parsing them is lots of fun if fun is pulling your hair out.
 
 This library provides an implementation of [RFC7235] which allows for the parsing of many known existing authorization headers (like Basic and Digest) as well as any future ones which follow the standard. Noteably, this library is less strict than it could be to parse some of these legacy formats.
@@ -37,10 +39,10 @@ app.get('/', function(req, res) {
 	}
 
 	// Get authorization header.
-	var auth = authorization.parse(req.get('authorization'));
+	var auth = authorization.parse(req.get('authorization')).for('Basic');
 
 	// No basic authentication provided.
-	if (!auth.scheme !== 'Basic') {
+	if (!auth) {
 		return fail();
 	}
 
@@ -58,3 +60,4 @@ app.get('/', function(req, res) {
 ```
 
 [RFC7235]: https://tools.ietf.org/html/rfc7235
+[express-authentication-header]: https://github.com/izaakschroeder/express-authentication-header
