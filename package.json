@@ -18,13 +18,13 @@
 		"coverage": "istanbul check-coverage --statement 100 --branch 100 --function 100"
 	},
 	"dependencies": {
-		"lodash": "^2.4.1"
+		"lodash": "^3.10.0"
 	},
 	"devDependencies": {
-		"eslint": "^0.10.0",
+		"eslint": "^0.24.1",
 		"eslint-plugin-nodeca": "^1.0.3",
-		"mocha": "^2.0.1",
-		"istanbul": "^0.3.2",
-		"chai": "^1.10.0"
+		"mocha": "^2.2.5",
+		"istanbul": "^0.3.17",
+		"chai": "^3.0.0"
 	}
 }
