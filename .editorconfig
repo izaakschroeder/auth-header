@@ -15,10 +15,7 @@ root = true
 # Pick some sane defaults for all files.
 [*]
 
-# UNIX line-endings are preferred since:
-# * git prefers them
-# * servers run on Linux
-# * most developers use Mac OS X
+# UNIX line-endings are preferred.
 # http://adaptivepatchwork.com/2012/03/01/mind-the-end-of-your-line/
 end_of_line = lf
 
@@ -32,9 +29,9 @@ trim_trailing_whitespace = true
 # http://stackoverflow.com/questions/729692/why-should-files-end-with-a-newline
 insert_final_newline = true
 
-# Herein be the apex of holy wars. Decidedly more idyllic than pragmatic.
+# Pragmatism today.
 # http://programmers.stackexchange.com/questions/57
-indent_style = tab
+indent_style = 2
 
 # Personal preference here. Smaller indent size means you can fit more on a line
 # which can be nice when there are lines with several indentations.
@@ -48,3 +45,7 @@ indent_size = 2
 # is also easier for line-based diffing tools to consume.
 # See: http://tex.stackexchange.com/questions/54140
 max_line_length = 80
+
+# Markdown uses trailing spaces to create line breaks.
+[*.md]
+trim_trailing_whitespace = false

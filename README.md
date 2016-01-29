@@ -25,10 +25,10 @@ This library provides an implementation of [RFC7235] which allows for the parsin
 In addition to the format of the header itself being in flux, WWW-Authenticate has its own nasty surprise: sometimes multiple authentication prompts can appear in one header, sometimes they can appear in multiple headers; we _ONLY_ support the latter case since trying to disambiguate between a second prompt and parameters for the first is just about impossible.
 
 ```javascript
-var authorization = require('auth-header'),
-	express = require('express');
+import * as authorization from 'auth-header';
+import express from 'express';
 
-var app = express();
+const app = express();
 
 app.get('/', function(req, res) {
 
@@ -39,18 +39,18 @@ app.get('/', function(req, res) {
 	}
 
 	// Get authorization header.
-	var auth = authorization.parse(req.get('authorization')).for('Basic');
+	var auth = authorization.parse(req.get('authorization'));
 
 	// No basic authentication provided.
-	if (!auth) {
+	if (auth.length !== 1 || auth[0].scheme !== 'Basic') {
 		return fail();
 	}
 
 	// Get the basic auth component.
-	var parts = Buffer(auth.token, 'base64').toString().split(':', 2);
+	var [un, pw] = Buffer(auth[0].token, 'base64').toString().split(':', 2);
 
 	// Verify authentication.
-	if (parts.length < 2 || parts[1] !== 'admin') {
+	if (pw !== 'admin') {
 		return fail();
 	}
 
