@@ -42,12 +42,12 @@ app.get('/', function(req, res) {
 	var auth = authorization.parse(req.get('authorization'));
 
 	// No basic authentication provided.
-	if (auth.length !== 1 || auth[0].scheme !== 'Basic') {
+	if (auth.scheme !== 'Basic') {
 		return fail();
 	}
 
 	// Get the basic auth component.
-	var [un, pw] = Buffer(auth[0].token, 'base64').toString().split(':', 2);
+	var [un, pw] = Buffer(auth.token, 'base64').toString().split(':', 2);
 
 	// Verify authentication.
 	if (pw !== 'admin') {
