@@ -116,4 +116,22 @@ describe('parse', () => {
       },
     });
   });
+
+  it('should handle multiple challenges when asked', () => {
+    const result = parse('Bearer scope="openid", Basic realm="foo"', true);
+    expect(result).to.deep.equal([
+      {
+        scheme: 'Bearer',
+        params: {
+          scope: 'openid',
+        },
+      },
+      {
+        scheme: 'Basic',
+        params: {
+          realm: 'foo',
+        },
+      },
+    ]);
+  });
 });

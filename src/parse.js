@@ -16,23 +16,35 @@ const normalize = (prev, _cur) => {
   return cur;
 };
 
-const parseProperties = (scheme, string) => {
+const parseProperties = (scheme, string, challenge) => {
   let res = null;
   let token = null;
-  const params = { };
+  let params = { };
+  const challenges = [];
+  let _scheme = scheme;
 
   while ((res = body.exec(string)) !== null) {
     if (res[2]) {
       params[res[1]] = normalize(params[res[1]], res[2]);
+    } else if (challenge) {
+      challenges.push({scheme: _scheme, params});
+      // Challenges don't have tokens so this is scheme for next challenge
+      _scheme = res[1].trim();
+      params = { };
     } else {
       token = normalize(token, res[1]);
     }
   }
 
+  if (challenge) {
+    challenges.push({scheme: _scheme, params});
+    return challenges;
+  }
+
   return {scheme, params, token};
 };
 
-export default (str) => {
+export default (str, challenge) => {
   if (typeof str !== 'string') {
     throw new TypeError('Header value must be a string.');
   }
@@ -44,5 +56,5 @@ export default (str) => {
     throw new TypeError(`Invalid scheme ${scheme}`);
   }
 
-  return parseProperties(scheme, str.substr(start));
+  return parseProperties(scheme, str.substr(start), challenge);
 };
