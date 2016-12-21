@@ -24,7 +24,7 @@
     "lint": "eslint --ignore-path .gitignore ."
   },
   "dependencies": {
-    "babel-core": "^6.4.5"
+    "es6-error": "^4.0.0"
   },
   "devDependencies": {
     "adana-cli": "^0.1.1",

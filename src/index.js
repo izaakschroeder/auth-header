@@ -1,4 +1,5 @@
+import InvalidHeaderError from './invalid-header-error';
 import format from './format';
 import parse from './parse';
 
-export {format, parse};
+export {InvalidHeaderError, format, parse};
