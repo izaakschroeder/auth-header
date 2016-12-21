@@ -1,3 +1,4 @@
+import InvalidHeaderError from './invalid-header-error';
 import {isScheme, unquote} from './util';
 
 // lol dis
@@ -34,14 +35,14 @@ const parseProperties = (scheme, string) => {
 
 export default (str) => {
   if (typeof str !== 'string') {
-    throw new TypeError('Header value must be a string.');
+    throw new InvalidHeaderError('Header value must be a string.');
   }
 
   const start = str.indexOf(' ');
   const scheme = str.substr(0, start);
 
   if (!isScheme(scheme)) {
-    throw new TypeError(`Invalid scheme ${scheme}`);
+    throw new InvalidHeaderError(`Invalid scheme ${scheme}`);
   }
 
   return parseProperties(scheme, str.substr(start));

@@ -1,29 +1,30 @@
 import {expect} from 'chai';
+import InvalidHeaderError from '../../src/invalid-header-error';
 import parse from '../../src/parse';
 
 describe('parse', () => {
   it('should fail on invalid schemes', () => {
     expect(() => {
-      parse('@foo');
-    }).to.throw(TypeError);
+      parse('@ foo');
+    }).to.throw(InvalidHeaderError, 'Invalid scheme @');
   });
 
   it('should fail if a boolean', () => {
     expect(() => {
       parse(true);
-    }).to.throw(TypeError);
+    }).to.throw(InvalidHeaderError, 'Header value must be a string.');
   });
 
   it('should fail if an object', () => {
     expect(() => {
       parse({ });
-    }).to.throw(TypeError);
+    }).to.throw(InvalidHeaderError, 'Header value must be a string.');
   });
 
   it('should fail if null', () => {
     expect(() => {
       parse(null);
-    }).to.throw(TypeError);
+    }).to.throw(InvalidHeaderError, 'Header value must be a string.');
   });
 
   it('should coalesce many values', () => {
