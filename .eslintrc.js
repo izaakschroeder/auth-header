@@ -1,7 +1,8 @@
 module.exports = {
 	root: true,
 	extends: [
-		'bluedrop/node',
-		'bluedrop/ecmascript-8'
+		'mitmaro',
+		'mitmaro/config/ecmascript-7',
+		'mitmaro/config/node',
 	],
 };

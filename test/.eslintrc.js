@@ -1,8 +1,6 @@
 module.exports = {
 	extends: [
-		'bluedrop/mocha'
+		'mitmaro/config/mocha',
+		'mitmaro/config/chai'
 	],
-	globals: {
-		chai: true,
-	},
 };

@@ -1,16 +1,21 @@
 {
-  "name": "auth-header",
+  "name": "@mitmaro/http-authorization-header",
+  "description": "Parse and create HTTP Authorization headers.",
   "version": "0.4.0",
-  "description": "For HTTP `Authorization` and `WWW-Authenticate` headers.",
-  "author": "Tim Oram <me@mitmaro.ca>",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "http",
     "headers",
-    "basic",
-    "auth",
-    "authorization"
+    "authorization",
+    "proxy-authorization"
   ],
   "license": "ISC",
+  "author": "Tim Oram <me@mitmaro.ca>",
+  "contributors": [
+    "Tim Oram <me@mitmaro.ca>"
+  ],
   "homepage": "https://github.com/MitMaro/auth-header",
   "repository": {
     "type": "git",
@@ -21,21 +26,24 @@
     "src/"
   ],
   "scripts": {
-    "clean": "./scripts/clean.sh",
-    "lint": "eslint .",
+    "lint": "./scripts/lint.bash",
     "test": "npm run lint && npm run test:coverage",
-    "test:unit": "./scripts/test.bash",
-    "test:coverage": "nyc ./scripts/test.bash"
+    "test:unit": "./scripts/test.bash :unit",
+    "test:coverage": "./scripts/test.bash :unit:coverage"
   },
   "devDependencies": {
+    "@mitmaro/build-scripts": "^0.1.5",
     "chai": "^4.1.2",
     "eslint": "^4.13.1",
-    "eslint-config-bluedrop": "^3.3.0",
+    "eslint-config-mitmaro": "^3.0.0",
     "eslint-plugin-filenames": "^1.2.0",
     "eslint-plugin-mocha": "^4.11.0",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-security": "^1.4.0",
     "mocha": "^4.0.1",
-    "nyc": "^11.3.0"
+    "nyc": "^11.4.1"
+  },
+  "dependencies": {
+    "jeepers": "^0.1.0"
   }
 }

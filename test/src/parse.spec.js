@@ -1,120 +1,497 @@
 'use strict';
 
+const InvalidHeaderError = require('../../src/error/invalid-header-error');
 const parse = require('../../src/parse');
 
-describe('parse', function () {
-	it('should fail on invalid schemes', function () {
-		expect(() => {
-			parse('@foo');
-		}).to.throw(TypeError);
-	});
+const extdAsciiStart = String.fromCharCode(0x80);
+const extdAsciiMiddle = String.fromCharCode(0xCC);
+const extdAsciiEnd = String.fromCharCode(0xFF);
 
-	it('should fail if a boolean', function () {
-		expect(() => {
-			parse(true);
-		}).to.throw(TypeError);
-	});
-
-	it('should fail if an object', function () {
-		expect(() => {
-			parse({ });
-		}).to.throw(TypeError);
-	});
-
-	it('should fail if null', function () {
-		expect(() => {
-			parse(null);
-		}).to.throw(TypeError);
-	});
-
-	it('should coalesce many values', function () {
-		const result = parse('foo a=1 a=2 a=3');
-		expect(result).to.deep.equal({
+describe('/src/parse', function () {
+	[
+		{
+			input: 'foo',
 			scheme: 'foo',
-			token: null,
-			params: {
-				a: ['1', '2', '3'],
-			},
+			values: [],
+		},
+		{
+			input: 'foo ',
+			scheme: 'foo',
+			values: [],
+		},
+		{
+			input: 'foo a=1',
+			scheme: 'foo',
+			values: [['a', '1']],
+		},
+		{
+			input: 'foo ,a=1',
+			scheme: 'foo',
+			values: [['a', '1']],
+		},
+
+		// whitespace tests
+		{
+			input: 'foo a   =   1',
+			scheme: 'foo',
+			values: [['a', '1']],
+		},
+		{
+			input: 'foo    a=1,a=1',
+			scheme: 'foo',
+			values: [['a', '1'], ['a', '1']],
+		},
+		{
+			input: 'foo  a = 1,a = 1',
+			scheme: 'foo',
+			values: [['a', '1'], ['a', '1']],
+		},
+		{
+			input: 'foo  a=1, a=1',
+			scheme: 'foo',
+			values: [['a', '1'], ['a', '1']],
+		},
+		{
+			input: 'foo  a=1,\ta=1',
+			scheme: 'foo',
+			values: [['a', '1'], ['a', '1']],
+		},
+		{
+			input: 'foo  a=1, \ta=1',
+			scheme: 'foo',
+			values: [['a', '1'], ['a', '1']],
+		},
+		{
+			input: 'foo  a=1,\t a=1',
+			scheme: 'foo',
+			values: [['a', '1'], ['a', '1']],
+		},
+		{
+			input: 'foo  a=1, \t a=1',
+			scheme: 'foo',
+			values: [['a', '1'], ['a', '1']],
+		},
+		{
+			input: 'foo  a=1\t,a=1',
+			scheme: 'foo',
+			values: [['a', '1'], ['a', '1']],
+		},
+		{
+			input: 'foo  a=1 \t,a=1',
+			scheme: 'foo',
+			values: [['a', '1'], ['a', '1']],
+		},
+		{
+			input: 'foo  a=1\t ,a=1',
+			scheme: 'foo',
+			values: [['a', '1'], ['a', '1']],
+		},
+		{
+			input: 'foo  a=1 \t ,a=1',
+			scheme: 'foo',
+			values: [['a', '1'], ['a', '1']],
+		},
+		{
+			input: 'foo a\t=\t1,a\t=\t1',
+			scheme: 'foo',
+			values: [['a', '1'], ['a', '1']],
+		},
+		{
+			input: 'foo a \t = \t 1,a \t = \t 1',
+			scheme: 'foo',
+			values: [['a', '1'], ['a', '1']],
+		},
+		{
+			input: 'foo a=1,a=1 ',
+			scheme: 'foo',
+			values: [['a', '1'], ['a', '1']],
+		},
+		{
+			input: 'foo a=1,a=1\t',
+			scheme: 'foo',
+			values: [['a', '1'], ['a', '1']],
+		},
+		{
+			input: 'foo a=1,a=1 \t',
+			scheme: 'foo',
+			values: [['a', '1'], ['a', '1']],
+		},
+		{
+			input: 'foo a=1,a=1\t ',
+			scheme: 'foo',
+			values: [['a', '1'], ['a', '1']],
+		},
+		{
+			input: 'foo , a=1',
+			scheme: 'foo',
+			values: [['a', '1']],
+		},
+		{
+			input: 'foo ,\ta=1',
+			scheme: 'foo',
+			values: [['a', '1']],
+		},
+		{
+			input: 'foo ,\t a=1',
+			scheme: 'foo',
+			values: [['a', '1']],
+		},
+		{
+			input: 'foo , \ta=1',
+			scheme: 'foo',
+			values: [['a', '1']],
+		},
+
+		// token tests
+		{
+			input: '0foo a=1',
+			scheme: '0foo',
+			values: [['a', '1']],
+		},
+		{
+			input: '9foo a=1',
+			scheme: '9foo',
+			values: [['a', '1']],
+		},
+		{
+			input: '!#$%&\'*+-.^_`|~ a=1',
+			scheme: '!#$%&\'*+-.^_`|~',
+			values: [['a', '1']],
+		},
+		{
+			input: 'AKZ a=1',
+			scheme: 'AKZ',
+			values: [['a', '1']],
+		},
+		{
+			input: 'akz a=1',
+			scheme: 'akz',
+			values: [['a', '1']],
+		},
+
+		// token68 tests
+		{
+			input: 'foo 0',
+			scheme: 'foo',
+			value: '0',
+		},
+		{
+			input: 'foo 9',
+			scheme: 'foo',
+			value: '9',
+		},
+		{
+			input: 'foo A',
+			scheme: 'foo',
+			value: 'A',
+		},
+		{
+			input: 'foo Z',
+			scheme: 'foo',
+			value: 'Z',
+		},
+		{
+			input: 'foo a',
+			scheme: 'foo',
+			value: 'a',
+		},
+		{
+			input: 'foo z',
+			scheme: 'foo',
+			value: 'z',
+		},
+		{
+			input: 'foo -',
+			scheme: 'foo',
+			value: '-',
+		},
+		{
+			input: 'foo .',
+			scheme: 'foo',
+			value: '.',
+		},
+		{
+			input: 'foo _',
+			scheme: 'foo',
+			value: '_',
+		},
+		{
+			input: 'foo ~',
+			scheme: 'foo',
+			value: '~',
+		},
+		{
+			input: 'foo +',
+			scheme: 'foo',
+			value: '+',
+		},
+		{
+			input: 'foo /',
+			scheme: 'foo',
+			value: '/',
+		},
+		{
+			input: 'foo aaaaa=',
+			scheme: 'foo',
+			value: 'aaaaa=',
+		},
+		{
+			input: 'foo aaaaa===',
+			scheme: 'foo',
+			value: 'aaaaa===',
+		},
+
+		// quoted string values
+		{
+			input: 'foo a=""',
+			scheme: 'foo',
+			values: [['a', '']],
+		},
+		{
+			input: 'foo a="1"',
+			scheme: 'foo',
+			values: [['a', '1']],
+		},
+		{
+			input: 'foo a=" 1"',
+			scheme: 'foo',
+			values: [['a', ' 1']],
+		},
+		{
+			input: 'foo a="1 "',
+			scheme: 'foo',
+			values: [['a', '1 ']],
+		},
+		{
+			input: 'foo a=" 1 "',
+			scheme: 'foo',
+			values: [['a', ' 1 ']],
+		},
+		{
+			input: 'foo a="\t1"',
+			scheme: 'foo',
+			values: [['a', '\t1']],
+		},
+		{
+			input: 'foo a="1\t"',
+			scheme: 'foo',
+			values: [['a', '1\t']],
+		},
+		{
+			input: 'foo a="\t1\t"',
+			scheme: 'foo',
+			values: [['a', '\t1\t']],
+		},
+		{
+			input: 'foo a="1", a="2"',
+			scheme: 'foo',
+			values: [['a', '1'], ['a', '2']],
+		},
+		{
+			input: `foo a="${extdAsciiStart}"`,
+			scheme: 'foo',
+			values: [['a', extdAsciiStart]],
+		},
+		{
+			input: `foo a="${extdAsciiMiddle}"`,
+			scheme: 'foo',
+			values: [['a', extdAsciiMiddle]],
+		},
+		{
+			input: `foo a="${extdAsciiEnd}"`,
+			scheme: 'foo',
+			values: [['a', extdAsciiEnd]],
+		},
+		{
+			input: 'foo a="]", a="]"',
+			scheme: 'foo',
+			values: [['a', ']'], ['a', ']']],
+		},
+		{
+			input: 'foo a="~", a="~"',
+			scheme: 'foo',
+			values: [['a', '~'], ['a', '~']],
+		},
+		{
+			input: 'foo a="!"',
+			scheme: 'foo',
+			values: [['a', '!']],
+		},
+		{
+			input: 'foo foo="bar", baz="foo"',
+			scheme: 'foo',
+			values: [['foo', 'bar'], ['baz', 'foo']],
+		},
+		{
+			input: 'foo abc="def\\"", abc="de\\"f", abc="\\"def"',
+			scheme: 'foo',
+			values: [['abc', 'def"'], ['abc', 'de"f'], ['abc', '"def']],
+		},
+		{
+			input: 'foo abc="\\"", abc="\\""',
+			scheme: 'foo',
+			values: [['abc', '"'], ['abc', '"']],
+		},
+		{
+			input: 'foo abc="\\"a", abc="\\"a"',
+			scheme: 'foo',
+			values: [['abc', '"a'], ['abc', '"a']],
+		},
+		{
+			input: 'foo abc="a\\"", abc="a\\""',
+			scheme: 'foo',
+			values: [['abc', 'a"'], ['abc', 'a"']],
+		},
+		{
+			input: `foo abc="\\${extdAsciiStart}", abc="\\${extdAsciiStart}"`,
+			scheme: 'foo',
+			values: [['abc', extdAsciiStart], ['abc', extdAsciiStart]],
+		},
+		{
+			input: `foo abc="\\${extdAsciiMiddle}", abc="\\${extdAsciiMiddle}"`,
+			scheme: 'foo',
+			values: [['abc', extdAsciiMiddle], ['abc', extdAsciiMiddle]],
+		},
+		{
+			input: `foo abc="\\${extdAsciiEnd}", abc="\\${extdAsciiEnd}"`,
+			scheme: 'foo',
+			values: [['abc', extdAsciiEnd], ['abc', extdAsciiEnd]],
+		},
+		{
+			input: 'foo abc="\\ ", abc="\\ "',
+			scheme: 'foo',
+			values: [['abc', ' '], ['abc', ' ']],
+		},
+		{
+			input: 'foo abc="\\~", abc="\\~"',
+			scheme: 'foo',
+			values: [['abc', '~'], ['abc', '~']],
+		},
+		{
+			input: 'foo abc="\\\t", abc="\\\t"',
+			scheme: 'foo',
+			values: [['abc', '\t'], ['abc', '\t']],
+		},
+		{
+			input: `foo abc="${extdAsciiStart}a${extdAsciiMiddle}a${extdAsciiEnd}"`,
+			scheme: 'foo',
+			values: [['abc', `${extdAsciiStart}a${extdAsciiMiddle}a${extdAsciiEnd}`]],
+		},
+
+		{
+			input: 'foo a=1, a=2',
+			scheme: 'foo',
+			values: [['a', '1'], ['a', '2']],
+		},
+		{
+			input: 'foo foo=bar, baz=foo',
+			scheme: 'foo',
+			values: [['foo', 'bar'], ['baz', 'foo']],
+		},
+		{
+			input: 'foo a=foo, b="bar",',
+			scheme: 'foo',
+			values: [['a', 'foo'], ['b', 'bar']],
+		},
+	].forEach(({input, scheme, value, values, only}) => {
+		(only ? it.only : it)(`should successfully parse: (${input})`, function () {
+			expect(parse(input)).to.deep.equal({
+				scheme,
+				value: value === undefined ? null : value,
+				values: values === undefined ? null : values,
+			});
 		});
 	});
 
-	it('should handle Basic', function () {
-		const result = parse('Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==');
-		expect(result).to.deep.equal({
-			scheme: 'Basic',
-			token: 'QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
-			params: { },
-		});
+	it('should fail if passed a boolean', function () {
+		expect(() => parse(true)).to.throw(InvalidHeaderError, 'Expected input to be a string');
 	});
 
-	it('should handle Basic with post-parameters', function () {
-		const result = parse('Basic 2932ff== realm="with\\"quote"');
-		expect(result).to.deep.equal({
-			scheme: 'Basic',
-			token: '2932ff==',
-			params: {
-				realm: 'with"quote',
-			},
-		});
+	it('should fail if passed an object', function () {
+		expect(() => parse({})).to.throw(InvalidHeaderError, 'Expected input to be a string');
 	});
 
-	it('should handle Basic with pre-parameters', function () {
-		const result = parse('Basic realm="foo" QWxhZGRpbjpvcGVuIHNlc2FtZQ==');
-		expect(result).to.deep.equal({
-			scheme: 'Basic',
-			token: 'QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
-			params: {
-				realm: 'foo',
-			},
-		});
+	it('should fail if passed a null', function () {
+		expect(() => parse(null)).to.throw(InvalidHeaderError, 'Expected input to be a string');
 	});
 
-	it('should handle AWS4-HMAC-SHA256', function () {
-    const result = parse('AWS4-HMAC-SHA256 Credential=EXAMPLE/20130524/us-east-1/s3/aws4_request, SignedHeaders=host;range;x-amz-date, Signature=fe5f80f77d5fa3beca038a248ff02'); // eslint-disable-line
-		expect(result).to.deep.equal({
-			scheme: 'AWS4-HMAC-SHA256',
-			token: null,
-			params: {
-				Credential: 'EXAMPLE/20130524/us-east-1/s3/aws4_request',
-				SignedHeaders: 'host;range;x-amz-date',
-				Signature: 'fe5f80f77d5fa3beca038a248ff02',
-			},
-		});
+	it('should fail if passed undefined', function () {
+		expect(() => parse(undefined)).to.throw(InvalidHeaderError, 'Expected input to be a string');
 	});
 
-	it('should handle Bearer', function () {
-		const result = parse('Bearer mF_9.B5f-4.1JqM');
-		expect(result).to.deep.equal({
-			scheme: 'Bearer',
-			token: 'mF_9.B5f-4.1JqM',
-			params: { },
-		});
+	it('should fail on invalid scheme: (@foo)', function () {
+		expect(() => parse('@foo')).to.throw(InvalidHeaderError, 'Invalid auth scheme');
 	});
 
-	it('should handle Digest', function () {
-    const result = parse('Digest realm="testrealm@host.com", qop="auth,auth-int", nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093", opaque="5ccc069c403ebaf9f0171e9517f40e41"'); // eslint-disable-line
-		expect(result).to.deep.equal({
-			scheme: 'Digest',
-			token: null,
-			params: {
-				realm: 'testrealm@host.com',
-				qop: 'auth,auth-int',
-				nonce: 'dcd98b7102dd2f0e8b11d0f600bfb0c093',
-				opaque: '5ccc069c403ebaf9f0171e9517f40e41',
-			},
-		});
+	it('should fail on invalid scheme: (f@oo)', function () {
+		expect(() => parse('f@oo')).to.throw(InvalidHeaderError, 'Invalid auth scheme; was expected a space');
 	});
 
-	it('should handle custom schemes', function () {
-		const result = parse('MyAuth api=42146432 api=934054 foo=bar baz="ding"');
-		expect(result).to.deep.equal({
-			scheme: 'MyAuth',
-			token: null,
-			params: {
-				api: ['42146432', '934054'],
-				foo: 'bar',
-				baz: 'ding',
-			},
-		});
+	it('should fail on invalid scheme: (foo@)', function () {
+		expect(() => parse('foo@')).to.throw(InvalidHeaderError, 'Invalid auth scheme; was expected a space');
+	});
+
+	it('should error on empty input', function () {
+		expect(() => parse('')).to.throw(InvalidHeaderError, 'Invalid auth scheme');
+	});
+
+	it('should error on invalid auth param name', function () {
+		expect(() => parse('foo a=1, @')).to.throw(InvalidHeaderError, 'Invalid auth param name');
+	});
+
+	it('should error on no equals after param name', function () {
+		expect(() => parse('foo a=1, a'))
+			.to.throw(InvalidHeaderError, 'Unexpected character in auth param; wanted an =');
+	});
+
+	it('should error on invalid character after param name', function () {
+		expect(() => parse('foo a=1, a,'))
+			.to.throw(InvalidHeaderError, 'Unexpected character in auth param; wanted an =');
+	});
+
+	it('should error on missing auth param value', function () {
+		expect(() => parse('foo a=1, a=')).to.throw(InvalidHeaderError, 'Invalid auth param value');
+	});
+
+	it('should error on malformed header value', function () {
+		expect(() => parse('foo a=1, a=b ccc')).to.throw(InvalidHeaderError, 'Malformed value');
+	});
+
+	it('should error on quoted string with no end', function () {
+		expect(() => parse('foo a=1, a="foo')).to.throw(InvalidHeaderError, 'Invalid auth param value');
+	});
+
+	it('should error on quoted string without end or value', function () {
+		expect(() => parse('foo a=1, a="')).to.throw(InvalidHeaderError, 'Invalid auth param value');
+	});
+
+	it('should error invalid characters in quoted value (0x1F us char)', function () {
+		expect(() => parse(`foo a=1, a="${String.fromCharCode(0x1F)}"'`))
+			.to.throw(InvalidHeaderError, 'Invalid auth param value');
+	});
+
+	it('should error invalid characters in quoted value (0x7F del char)', function () {
+		expect(() => parse(`foo a=1, a="${String.fromCharCode(0x7F)}"'`))
+			.to.throw(InvalidHeaderError, 'Invalid auth param value');
+	});
+
+	it('should error invalid characters in quoted value (outside US-ASCII charset)', function () {
+		expect(() => parse(`foo a=1, a="${String.fromCharCode(0x100)}"'`))
+			.to.throw(InvalidHeaderError, 'Invalid auth param value');
+	});
+
+	it('should error invalid characters in quoted pair (0x1F us char)', function () {
+		expect(() => parse(`foo a=1, a="\\${String.fromCharCode(0x1F)}"'`))
+			.to.throw(InvalidHeaderError, 'Invalid auth param value');
+	});
+
+	it('should error invalid characters in quoted pair (0x7F del char)', function () {
+		expect(() => parse(`foo a=1, a="\\${String.fromCharCode(0x7F)}"'`))
+			.to.throw(InvalidHeaderError, 'Invalid auth param value');
+	});
+
+	it('should error invalid characters in quoted pair (outside US-ASCII charset)', function () {
+		expect(() => parse(`foo a=1, a="\\${String.fromCharCode(0x100)}"'`))
+			.to.throw(InvalidHeaderError, 'Invalid auth param value');
 	});
 });

@@ -1,12 +1,19 @@
 sudo: false
 language: node_js
-matrix:
-  include:
-    # Run tests in Node.js 4.x
-    - node_js: '4'
-    # Run tests in Node.js 5.x
-    - node_js: '5'
-
-after_script:
-  - npm install coveralls
-  - cat ./coverage/coverage.json | ./node_modules/.bin/adana --format lcov | ./node_modules/coveralls/bin/coveralls.js
+branches:
+  only:
+  - master
+  - "/^v\\d+\\.\\d+\\.\\d+$/"
+node_js:
+  - '6'
+  - '8'
+script: npm run test
+deploy:
+  provider: npm
+  email: mitmaro@gmail.com
+  api_key:
+    secure: TODO-ADD
+  on:
+    tags: true
+    repo: MitMaro/eslint-config-mitmaro
+    node: '8'
