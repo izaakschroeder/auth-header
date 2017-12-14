@@ -1,4 +1,6 @@
-import format from './format';
-import parse from './parse';
+'use strict';
 
-export {format, parse};
+const format = require('./format');
+const parse = require('./parse');
+
+module.exports = {format, parse};

@@ -1,0 +1,6 @@
+--recursive
+--check-leaks
+--reporter spec
+--colors
+--require test/mocha-bootstrap.js
+--slow 500

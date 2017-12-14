@@ -1,44 +1,41 @@
 {
   "name": "auth-header",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "For HTTP `Authorization` and `WWW-Authenticate` headers.",
-  "author": "Izaak Schroeder <izaak.schroeder@gmail.com>",
+  "author": "Tim Oram <me@mitmaro.ca>",
   "keywords": [
     "http",
-    "express",
+    "headers",
     "basic",
     "auth",
     "authorization"
   ],
-  "license": "CC0-1.0",
-  "homepage": "https://github.com/izaakschroeder/auth-header",
+  "license": "ISC",
+  "homepage": "https://github.com/MitMaro/auth-header",
   "repository": {
     "type": "git",
-    "url": "https://github.com/izaakschroeder/auth-header.git"
+    "url": "https://github.com/MitMaro/auth-header.git"
   },
-  "main": "dist/index.js",
+  "main": "src/index.js",
+  "files": [
+    "src/"
+  ],
   "scripts": {
-    "test": "npm run lint && npm run spec",
-		"prepublish": "./node_modules/.bin/babel -s -d dist src",
-    "spec": "NODE_ENV=test ./node_modules/.bin/mocha --compilers js:babel-core/register -r adana-dump -R spec test/spec",
-    "lint": "eslint --ignore-path .gitignore ."
-  },
-  "dependencies": {
-    "babel-core": "^6.4.5"
+    "clean": "./scripts/clean.sh",
+    "lint": "eslint .",
+    "test": "npm run lint && npm run test:coverage",
+    "test:unit": "./scripts/test.bash",
+    "test:coverage": "nyc ./scripts/test.bash"
   },
   "devDependencies": {
-    "adana-cli": "^0.1.1",
-    "adana-dump": "^0.1.0",
-    "adana-format-lcov": "^0.1.1",
-    "babel-cli": "^6.4.5",
-    "babel-core": "^6.4.5",
-    "babel-preset-metalab": "^0.2.0",
-    "eslint": "^1.10.3",
-    "eslint-config-metalab": "^2.0.0-beta.1",
-    "eslint-plugin-filenames": "^0.2.0",
-    "eslint-plugin-import": "^0.12.1",
-    "eslint-plugin-react": "^3.16.0",
-    "mocha": "^2.3.4",
-    "chai": "^3.4.1"
+    "chai": "^4.1.2",
+    "eslint": "^4.13.1",
+    "eslint-config-bluedrop": "^3.3.0",
+    "eslint-plugin-filenames": "^1.2.0",
+    "eslint-plugin-mocha": "^4.11.0",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-security": "^1.4.0",
+    "mocha": "^4.0.1",
+    "nyc": "^11.3.0"
   }
 }
