@@ -10,6 +10,8 @@ describe('index', function () {
 			'createToken68',
 			'createToken68Unsafe',
 			'parse',
+			'InvalidHeaderError',
+			'InvalidInputError',
 		]);
 	});
 });

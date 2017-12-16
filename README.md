@@ -172,7 +172,7 @@ Based on [auth-header][8] which was licensed under [CC0-1.0][9]. This project is
 [1]:https://david-dm.org/MitMaro/http-authorization-header
 [2]:https://travis-ci.org/MitMaro/http-authorization-header
 [3]:https://coveralls.io/github/MitMaro/http-authorization-header?branch=master
-[4]:https://www.npmjs.com/package/server-shutdown
+[4]:https://www.npmjs.com/package/@mitmaro/http-authorization-header
 [5]:https://raw.githubusercontent.com/MitMaro/http-authorization-header/master/LICENSE
 [6]:https://tools.ietf.org/html/rfc7235
 [7]:https://nodejs.org/en/download/
