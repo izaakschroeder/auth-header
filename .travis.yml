@@ -1,19 +1,19 @@
 sudo: false
 language: node_js
 branches:
-  only:
-  - master
-  - "/^v\\d+\\.\\d+\\.\\d+$/"
+    only:
+        - master
+        - "/^v\\d+\\.\\d+\\.\\d+$/"
 node_js:
-  - '6'
-  - '8'
+    - '6'
+    - '8'
 script: npm run test
 deploy:
-  provider: npm
-  email: mitmaro@gmail.com
-  api_key:
-    secure: TODO-ADD
-  on:
-    tags: true
-    repo: MitMaro/eslint-config-mitmaro
-    node: '8'
+    provider: npm
+    email: mitmaro@gmail.com
+    api_key:
+        secure: ZkGS3CEjNSWGafzMESMEucYx4wmROiHbjvy6ytdM5w6jsGFOX5EfxUjemxftxs+8v686BDHtklOPmWox9iyc2jk3RvFbBdlBg5QI9OwbQrshfJA8nCDQZfjrWe355zwMhHLE2eoNRzmZi8nuPb3ovybZWTdSL+Sk9vRsDcW+P9112pGdOa0cJ2M1ORewiz6x7fpRKJK0sODgaro+nfabfG5uWEle7PnqNYoVqgeoqqzQ5Az5sUlws0l3K3LDUgY8ZmMSD3Z/aAVC9cp9Byd+RrpssTRjrm236dCpsQ4sPQQSjlzgiowPa+sgkdHxW89q6dium7oLazG2cxRs4kQ+OFNIycyAHg/JQ9X0Q/XX+DH3NgjHGc+oF36m8dViRsXv1dpX/cWnCPyRflF1Z9c8I/1rYT+fB6AvIbywDjuxuOtxEQKNZOkLVD4VdQoysc8HFuSW1ujJsK99eGDiziftarXsF7Kapu9LWTmoFj7BYGDOuicRHic9EiBsC/0hfCZuEfbF3+zQ6w6uwu2R5tpv7jz8L/pYNSwqROG+GVoHxT8iWTYeBNxekXW6knW719zh4nU4lJmIex9v/S3o74UGQ51VIMzoo2+1W2gjdJIy13JjImbXRkFBfIBpfLPxhGcQRVbyA+j66grNTZsWwb4/3m+zNexXcSrRPPa0IJpV4Y4=
+    on:
+        tags: true
+        repo: MitMaro/eslint-config-mitmaro
+        node: '8'

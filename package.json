@@ -16,10 +16,10 @@
   "contributors": [
     "Tim Oram <me@mitmaro.ca>"
   ],
-  "homepage": "https://github.com/MitMaro/auth-header",
+  "homepage": "https://github.com/MitMaro/http-authorization-header",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MitMaro/auth-header.git"
+    "url": "https://github.com/MitMaro/http-authorization-header.git"
   },
   "main": "src/index.js",
   "files": [
