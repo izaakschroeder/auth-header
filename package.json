@@ -1,44 +1,49 @@
 {
-  "name": "auth-header",
-  "version": "0.3.1",
-  "description": "For HTTP `Authorization` and `WWW-Authenticate` headers.",
-  "author": "Izaak Schroeder <izaak.schroeder@gmail.com>",
+  "name": "@mitmaro/http-authorization-header",
+  "description": "Parse and create HTTP Authorization headers.",
+  "version": "0.4.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "http",
-    "express",
-    "basic",
-    "auth",
-    "authorization"
+    "headers",
+    "authorization",
+    "proxy-authorization"
   ],
-  "license": "CC0-1.0",
-  "homepage": "https://github.com/izaakschroeder/auth-header",
+  "license": "ISC",
+  "author": "Tim Oram <me@mitmaro.ca>",
+  "contributors": [
+    "Tim Oram <me@mitmaro.ca>"
+  ],
+  "homepage": "https://github.com/MitMaro/http-authorization-header",
   "repository": {
     "type": "git",
-    "url": "https://github.com/izaakschroeder/auth-header.git"
+    "url": "https://github.com/MitMaro/http-authorization-header.git"
   },
-  "main": "dist/index.js",
+  "main": "src/index.js",
+  "files": [
+    "src/"
+  ],
   "scripts": {
-    "test": "npm run lint && npm run spec",
-		"prepublish": "./node_modules/.bin/babel -s -d dist src",
-    "spec": "NODE_ENV=test ./node_modules/.bin/mocha --compilers js:babel-core/register -r adana-dump -R spec test/spec",
-    "lint": "eslint --ignore-path .gitignore ."
-  },
-  "dependencies": {
-    "babel-core": "^6.4.5"
+    "lint": "./scripts/lint.bash",
+    "test": "npm run lint && npm run test:coverage",
+    "test:unit": "./scripts/test.bash :unit",
+    "test:coverage": "./scripts/test.bash :unit:coverage"
   },
   "devDependencies": {
-    "adana-cli": "^0.1.1",
-    "adana-dump": "^0.1.0",
-    "adana-format-lcov": "^0.1.1",
-    "babel-cli": "^6.4.5",
-    "babel-core": "^6.4.5",
-    "babel-preset-metalab": "^0.2.0",
-    "eslint": "^1.10.3",
-    "eslint-config-metalab": "^2.0.0-beta.1",
-    "eslint-plugin-filenames": "^0.2.0",
-    "eslint-plugin-import": "^0.12.1",
-    "eslint-plugin-react": "^3.16.0",
-    "mocha": "^2.3.4",
-    "chai": "^3.4.1"
+    "@mitmaro/build-scripts": "^0.1.5",
+    "chai": "^4.1.2",
+    "eslint": "^4.13.1",
+    "eslint-config-mitmaro": "^3.0.0",
+    "eslint-plugin-filenames": "^1.2.0",
+    "eslint-plugin-mocha": "^4.11.0",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-security": "^1.4.0",
+    "mocha": "^4.0.1",
+    "nyc": "^11.4.1"
+  },
+  "dependencies": {
+    "jeepers": "^0.1.0"
   }
 }
