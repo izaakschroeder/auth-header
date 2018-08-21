@@ -1,6 +1,9 @@
-{
-  "extends": [
-    "metalab/base",
-    "metalab/node"
-  ]
-}
+extends:
+  - metalab
+env:
+  node: true
+overrides:
+  -
+    files: "*.spec.js"
+    env:
+      jest: true
