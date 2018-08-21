@@ -17,14 +17,15 @@
     "url": "https://github.com/izaakschroeder/auth-header.git"
   },
   "main": "dist/index.js",
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "test": "npm run lint && npm run spec",
 		"prepublish": "./node_modules/.bin/babel -s -d dist src",
     "spec": "NODE_ENV=test ./node_modules/.bin/mocha --compilers js:babel-core/register -r adana-dump -R spec test/spec",
     "lint": "eslint --ignore-path .gitignore ."
-  },
-  "dependencies": {
-    "babel-core": "^6.4.5"
   },
   "devDependencies": {
     "adana-cli": "^0.1.1",
