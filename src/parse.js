@@ -22,7 +22,7 @@ const normalize = (
 
 type Result = {
   scheme: string,
-  params: {[string]: string},
+  params: {[string]: string | Array<string>},
   token: ?(string | Array<string>),
 };
 
